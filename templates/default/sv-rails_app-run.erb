@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+HOME_PATH=<%= @options[:home_path] %>
+APP_PATH=<%= @options[:app_path] %>
+TARGET_USER=<%= @options[:target_user] %>
+TARGET_RUBY=<%= @options[:target_ruby] %>
+RAILS_ENV=<%= @options[:target_env] %>
+UNICORN_PID_FILE=$APP_PATH/current/tmp/pids/unicorn.pid
+
+test -f $UNICORN_PID_FILE && UNICORN_PID=`cat $UNICORN_PID_FILE` || UNICORN_PID=-1
+
+cd $APP_PATH/current
+EXISTING_PID=`pgrep -f 'unicorn_rails master'` && test $EXISTING_PID = $UNICORN_PID || HOME=$HOME_PATH chpst -u $TARGET_USER $HOME_PATH/.rbenv/shims/bundle exec unicorn_rails -c config/unicorn.rb -E $RAILS_ENV -D
+
+# forward signals received in this wrapper to the Unicorn process:
+for sig in HUP USR1 USR2 QUIT TERM QUIT
+do
+  trap 'kill -'$sig' $(cat $UNICORN_PID_FILE)' $sig
+done
+
+# loop forever while Unicorn has its pid file
+while ( test -e $UNICORN_PID_FILE && ps -p `cat $UNICORN_PID_FILE` > /dev/null ) || ( test -e $UNICORN_PID_FILE.oldbin && ps -p `cat $UNICORN_PID_FILE.oldbin` > /dev/null )
+do
+  sleep 1
+done

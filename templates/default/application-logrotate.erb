@@ -1,0 +1,19 @@
+<%= @logs %>/*.log {
+    <%= @how_often ? @how_often : "daily" %>
+    <% if @copytruncate -%>
+    copytruncate
+    <% end -%>
+    missingok
+    notifempty
+    rotate <%= @rotate %>
+    compress
+    dateext
+    create 644 "app" "app"
+    delaycompress
+    sharedscripts
+    postrotate
+      test -s <%= @pidfile %> && kill -USR1 "$(cat <%= @pidfile %>)"
+    endscript
+}
+
+

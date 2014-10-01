@@ -1,0 +1,69 @@
+upstream app {
+  server <%= @backend %> fail_timeout=0;
+}
+
+server {
+  listen 80;
+  server_name ~^www\.(?<domain>.+)$;
+  return 301 $scheme://$domain$request_uri;
+}
+
+server {
+  listen 80;
+  server_name "<%= @domain %>";
+
+  access_log /var/log/nginx/<%= @app_name %>-access.log;
+  error_log /var/log/nginx/<%= @app_name %>-error.log;
+
+  charset utf-8;
+  
+  client_max_body_size 256m;
+  root <%= @app_path %>/current/public;
+
+  proxy_intercept_errors <%= @developemnt_mode ? 'off' : 'on' %>;
+
+  error_page 500 /500.html;
+  error_page 503 /system/maintenance.html;
+
+
+  <% if @protected_site %>
+  auth_basic "Auth";
+  auth_basic_user_file /etc/nginx/#{app_name}-site-htpasswd;
+  <% end %>
+
+  location = /robots.txt {
+    try_files /robots/$city/robots.txt /robots.txt @app;
+  }
+
+  location ~* ^/yandex_.+\.txt {
+    try_files /$uri =404;
+  }
+
+  location / {
+    rewrite ^/(.*)/$ /$1 permanent;
+    try_files $uri @app;
+  }
+
+  location @app {
+    if (-f <%= @app_path %>/current/public/system/maintenance.html) {
+      return 503;
+    }
+    proxy_pass http://app;
+    proxy_redirect off;
+    proxy_set_header Host $host<%= ":#{@vagrant_port}" if @vagrant_port -%>;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_read_timeout 300;
+    client_max_body_size 256m;
+    proxy_buffer_size 16k;
+    proxy_buffers 32 16k;
+  }
+
+  <% unless @development_mode %>
+
+  location ~* \.(jpg|jpeg|gif|png|ico|css|zip|tgz|gz|rar|bz2|doc|xls|exe|pdf|ppt|txt|tar|mid|midi|wav|bmp|rtf|js|swf|flv|avi|djvu|mp3|mp4|ogv|3gp)$ {
+    root <%= @app_path %>/current/public;
+  }
+
+  <% end %>
+}
