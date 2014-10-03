@@ -5,7 +5,7 @@ include_recipe('runit')
   package pkg
 end
 
-user = 'app'
+user = node['app-user']
 domain = node["app-domain"]
 environment = node["app-environment"]
 app_name = domain.split('.', 2)[0]
