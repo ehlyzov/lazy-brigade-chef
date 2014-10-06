@@ -76,7 +76,7 @@ template "#{app_dir}/shared/config/secrets.yml" do
   owner user
   group user
   variables secrets: node['secrets'],
-            evnironment: environment
+            environment: environment
 end
 
 
