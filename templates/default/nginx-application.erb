@@ -32,7 +32,7 @@ server {
   <% end %>
 
   location = /robots.txt {
-    try_files /robots/$city/robots.txt /robots.txt @app;
+    try_files /robots.txt @app;
   }
 
   location ~* ^/yandex_.+\.txt {
