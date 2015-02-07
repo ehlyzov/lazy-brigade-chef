@@ -1,9 +1,10 @@
-name             'lazy-brigade'
+name             'lazy_brigade'
 maintainer       'Eugene Hlyzov'
 maintainer_email 'hlyzov@gmail.com'
 license          'MIT'
 description      'These guys can do some rails, but do not expect too much'
-version          '0.2.4'
+version          '1.0.0'
 
 depends          'sudo'
 depends          'nginx'
+depends          'runit'

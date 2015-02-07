@@ -36,7 +36,8 @@ template File.join(deploy_dir, 'config', 'deploy.rb') do
     app_name: app_name,
     repo_url: repo_url,
     app_dir: app_dir,
-    user: user
+    user: user,
+    rbenv_ruby: node['rbenv']['user_installs'][0]['global']
   })
   action :nothing
   subscribes :create, "directory[#{deploy_dir}/config]"
