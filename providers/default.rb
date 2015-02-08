@@ -35,7 +35,7 @@ action :create do
         to app_dir
       end
 
-      sudo user do
+      sudo "#{user}_#{app_name}" do
         user user
         commands ["/usr/bin/sv * #{app_name}*"]
         host "ALL"
