@@ -108,7 +108,7 @@ action :create do
         cookbook 'lazy_brigade'
         owner user
         group user
-        variables env: node['dotenv']
+        variables env: new_resource.dotenv
       end
     end
 
