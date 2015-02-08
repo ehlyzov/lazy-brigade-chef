@@ -58,17 +58,19 @@ action :create do
       )
     end
 
-    runit_service "#{app_name}_rails" do
-      default_logger true
-      run_template_name "rails_app"
-      cookbook 'lazy_brigade'      
-      options({
-        :home_path => "/home/#{user}",
-        :app_path => app_dir,
-        :target_user => user,
-        :target_ruby => "default",
-        :target_env => environment
-      })
+    if @current_resource.exists    
+      runit_service "#{app_name}_rails" do
+        default_logger true
+        run_template_name "rails_app"
+        cookbook 'lazy_brigade'
+        options({
+          :home_path => "/home/#{user}",
+          :app_path => app_dir,
+          :target_user => user,
+          :target_ruby => "default",
+          :target_env => environment
+        })
+      end
     end
 
     template "#{app_dir}/shared/config/unicorn.rb" do
