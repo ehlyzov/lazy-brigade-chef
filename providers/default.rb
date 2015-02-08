@@ -12,35 +12,33 @@ action :create do
   app_dir  = new_resource.app_dir
 
 
-  unless @current_resource.exists
-    converge_by "create directories" do
-      directory app_dir do
-        owner user
-        group user
-      end
-
-      directory "#{app_dir}/shared" do
-        owner user
-        group user
-      end
-
-      directory "#{app_dir}/shared/config" do
-        owner user
-        group user
-      end
+  converge_by "create directories" do
+    directory app_dir do
+      owner user
+      group user
     end
 
-    converge_by "Setup application user: #{user}" do
-      link "/home/#{user}/#{app_name}" do
-        to app_dir
-      end
+    directory "#{app_dir}/shared" do
+      owner user
+      group user
+    end
 
-      sudo "#{user}_#{app_name}" do
-        user user
-        commands ["/usr/bin/sv * #{app_name}*"]
-        host "ALL"
-        nopasswd true
-      end
+    directory "#{app_dir}/shared/config" do
+      owner user
+      group user
+    end
+  end
+
+  converge_by "Setup application user: #{user}" do
+    link "/home/#{user}/#{app_name}" do
+      to app_dir
+    end
+
+    sudo "#{user}_#{app_name}" do
+      user user
+      commands ["/usr/bin/sv * #{app_name}*"]
+      host "ALL"
+      nopasswd true
     end
   end
 
@@ -58,7 +56,7 @@ action :create do
       )
     end
 
-    if @current_resource.exists    
+    if @current_resource.exists
       runit_service "#{app_name}_rails" do
         default_logger true
         run_template_name "rails_app"
