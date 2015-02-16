@@ -3,7 +3,7 @@ maintainer       'Eugene Hlyzov'
 maintainer_email 'hlyzov@gmail.com'
 license          'MIT'
 description      'These guys can do some rails, but do not expect too much'
-version          '1.0.0'
+version          '1.0.1'
 
 depends          'sudo'
 depends          'nginx'

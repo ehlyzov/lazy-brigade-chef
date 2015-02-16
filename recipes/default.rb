@@ -9,6 +9,7 @@ if apps = node['lazy-brigade-apps']
       environment node[app]['environment']
       unicorn_workers node[app]['unicorn-workers']
       app_secrets node[app]['secrets']
+      dotenv node[app]['dotenv']
     end
   end
 end
